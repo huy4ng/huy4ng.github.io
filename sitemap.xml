@@ -1,18 +1,81 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<?xml-stylesheet type="text/xsl" href="http://huy4ng.github.com/sitemap.xsl"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
   <url>
-    <loc>https://huy4ng.github.io/</loc>
-    <lastmod>2021-12-17T22:45:41+08:00</lastmod>
-  </url><url>
-    <loc>https://huy4ng.github.io/posts/</loc>
-    <lastmod>2021-12-17T22:45:41+08:00</lastmod>
-  </url><url>
-    <loc>https://huy4ng.github.io/posts/%E5%A6%82%E4%BD%95%E5%9C%A8%E6%B6%88%E8%B4%B9%E7%A4%BE%E4%BC%9A%E5%BD%93%E4%B8%AA%E7%A9%B7%E4%BA%BA/</loc>
-    <lastmod>2021-12-17T22:45:41+08:00</lastmod>
-  </url><url>
-    <loc>https://huy4ng.github.io/categories/</loc>
-  </url><url>
-    <loc>https://huy4ng.github.io/tags/</loc>
+    <loc>http://huy4ng.github.com/categories/</loc>
+    <lastmod>2021-12-19T00:58:13+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
   </url>
+  
+  <url>
+    <loc>http://huy4ng.github.com/categories/index/</loc>
+    <lastmod>2021-12-19T00:58:13+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://huy4ng.github.com/tags/linux/</loc>
+    <lastmod>2021-12-19T00:58:13+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://huy4ng.github.com/post/linux%E6%8F%90%E6%9D%83%E6%96%B9%E6%B3%95%E6%95%B4%E7%90%86/</loc>
+    <lastmod>2021-12-19T00:58:13+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://huy4ng.github.com/post/</loc>
+    <lastmod>2021-12-19T00:58:13+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://huy4ng.github.com/tags/</loc>
+    <lastmod>2021-12-19T00:58:13+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://huy4ng.github.com/</loc>
+    <lastmod>2021-12-19T00:58:13+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://huy4ng.github.com/tags/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/</loc>
+    <lastmod>2021-12-19T00:58:13+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://huy4ng.github.com/tags/%E7%BA%A2%E8%93%9D%E5%AF%B9%E6%8A%97/</loc>
+    <lastmod>2021-12-19T00:58:13+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://huy4ng.github.com/post/%E5%A6%82%E4%BD%95%E5%9C%A8%E6%B6%88%E8%B4%B9%E7%A4%BE%E4%BC%9A%E5%BD%93%E4%B8%AA%E7%A9%B7%E4%BA%BA/</loc>
+    <lastmod>2021-12-17T22:45:41+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://huy4ng.github.com/tags/%E6%84%9F%E6%82%9F/</loc>
+    <lastmod>2021-12-17T22:45:41+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
 </urlset>

@@ -1,9 +1,48 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Tags on huy4ng&#39;s Blog</title>
-    <link>https://huy4ng.github.io/tags/</link>
-    <description>Recent content in Tags on huy4ng&#39;s Blog</description>
-    <generator>Hugo -- gohugo.io</generator><atom:link href="https://huy4ng.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <title>Tags on 一钩淡月天如水</title>
+    <link>http://huy4ng.github.com/tags/</link>
+    <description>Recent content in Tags on 一钩淡月天如水</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>huy4ng</copyright>
+    <lastBuildDate>Sun, 19 Dec 2021 00:58:13 +0800</lastBuildDate><atom:link href="http://huy4ng.github.com/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Linux</title>
+      <link>http://huy4ng.github.com/tags/linux/</link>
+      <pubDate>Sun, 19 Dec 2021 00:58:13 +0800</pubDate>
+      
+      <guid>http://huy4ng.github.com/tags/linux/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>渗透测试</title>
+      <link>http://huy4ng.github.com/tags/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/</link>
+      <pubDate>Sun, 19 Dec 2021 00:58:13 +0800</pubDate>
+      
+      <guid>http://huy4ng.github.com/tags/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>红蓝对抗</title>
+      <link>http://huy4ng.github.com/tags/%E7%BA%A2%E8%93%9D%E5%AF%B9%E6%8A%97/</link>
+      <pubDate>Sun, 19 Dec 2021 00:58:13 +0800</pubDate>
+      
+      <guid>http://huy4ng.github.com/tags/%E7%BA%A2%E8%93%9D%E5%AF%B9%E6%8A%97/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>感悟</title>
+      <link>http://huy4ng.github.com/tags/%E6%84%9F%E6%82%9F/</link>
+      <pubDate>Fri, 17 Dec 2021 22:45:41 +0800</pubDate>
+      
+      <guid>http://huy4ng.github.com/tags/%E6%84%9F%E6%82%9F/</guid>
+      <description></description>
+    </item>
+    
   </channel>
 </rss>

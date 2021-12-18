@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on 一钩淡月天如水</title>
+    <link>http://huy4ng.github.com/post/</link>
+    <description>Recent content in Posts on 一钩淡月天如水</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>huy4ng</copyright>
+    <lastBuildDate>Sun, 19 Dec 2021 00:58:13 +0800</lastBuildDate><atom:link href="http://huy4ng.github.com/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Linux提权方法整理</title>
+      <link>http://huy4ng.github.com/post/linux%E6%8F%90%E6%9D%83%E6%96%B9%E6%B3%95%E6%95%B4%E7%90%86/</link>
+      <pubDate>Sun, 19 Dec 2021 00:58:13 +0800</pubDate>
+      
+      <guid>http://huy4ng.github.com/post/linux%E6%8F%90%E6%9D%83%E6%96%B9%E6%B3%95%E6%95%B4%E7%90%86/</guid>
+      <description>内核提权 常规内核提权 查看Linux版本 uname -a 查找对应内核的exp，并下载C文件进行编译： searchsploit ubuntu 4.4.0 searchsploit -m linux/local/45010.c gcc 45010.c -o 45010 #编译 将编译好的exp上传到目标t</description>
+    </item>
+    
+    <item>
+      <title>如何在消费社会当个穷人</title>
+      <link>http://huy4ng.github.com/post/%E5%A6%82%E4%BD%95%E5%9C%A8%E6%B6%88%E8%B4%B9%E7%A4%BE%E4%BC%9A%E5%BD%93%E4%B8%AA%E7%A9%B7%E4%BA%BA/</link>
+      <pubDate>Fri, 17 Dec 2021 22:45:41 +0800</pubDate>
+      
+      <guid>http://huy4ng.github.com/post/%E5%A6%82%E4%BD%95%E5%9C%A8%E6%B6%88%E8%B4%B9%E7%A4%BE%E4%BC%9A%E5%BD%93%E4%B8%AA%E7%A9%B7%E4%BA%BA/</guid>
+      <description>今年的“双11”有些不一样：以往年年破记录的狂欢，如今还没开场，就已收到了越来越多消费者的吐槽，不仅“羊毛越来越难薅”，很多人甚至根本提不起</description>
+    </item>
+    
+  </channel>
+</rss>

